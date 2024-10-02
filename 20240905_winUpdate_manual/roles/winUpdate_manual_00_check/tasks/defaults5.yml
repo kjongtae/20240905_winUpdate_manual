@@ -1,0 +1,36 @@
+---
+- name: ckeck time2
+  shell: "date +%H:%M"
+  register: end_time
+  delegate_to: localhost
+
+#- name: compare ck_install with kb
+#  set_fact:
+#    result: "{{ 'false' if ck_install == kb else 'true' }}"
+#  ignore_errors: true
+
+- name: result / set_fact
+  set_fact:
+    act_result: {
+      'doc': {
+        'endTime': "{{ end_time.stdout_lines.0 }}"
+      }
+    }
+
+- name: insert result
+  ansible.builtin.uri:
+    url: "{{ post_win_server_patch_update_url }}"
+    user: "elastic"
+    password: "elastic1234"
+    method: POST
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+#       body_format: classesRating_mapping.json
+    body_format: json
+    body:
+      "{{ act_result }}"
+    validate_certs: no
+    status_code: 200,201
+    timeout: 10
+  delegate_to: localhost

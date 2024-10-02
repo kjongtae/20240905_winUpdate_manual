@@ -1,0 +1,7 @@
+---
+- name: reboot
+  win_reboot:
+    reboot_timeout: 3600
+  register: reboot_state
+  ignore_unreachable: yes
+  ignore_errors: true

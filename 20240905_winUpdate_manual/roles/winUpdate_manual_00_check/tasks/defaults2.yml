@@ -1,0 +1,42 @@
+---
+- name: Set WSUS variables for default
+  set_fact:
+    kb: "noData"
+    wsus_folder: "noData"
+    wsus_filename: "noData"
+
+- name: Set WSUS variables for Windows Server 2012 R2
+  set_fact:
+    kb: "{{ kb_win2012 }}"
+    wsus_folder: "{{ wsus_folder_2012 }}"
+    wsus_filename: "{{ wsus_filename_2012 }}"
+  when: 
+    - "'Windows Server 2012 R2' in ansible_distribution"
+    - ansible_distribution_version.startswith('6.3')
+
+- name: Set WSUS variables for Windows Server 2016
+  set_fact:
+    kb: "{{ kb_win2016 }}"
+    wsus_folder: "{{ wsus_folder_2016 }}"
+    wsus_filename: "{{ wsus_filename_2016 }}"
+  when: 
+    - "'Windows Server 2016' in ansible_distribution"
+    - ansible_distribution_version.startswith('10.0.14393')
+
+- name: Set WSUS variables for Windows Server 2019
+  set_fact:
+    kb: "{{ kb_win2019 }}"
+    wsus_folder: "{{ wsus_folder_2019 }}"
+    wsus_filename: "{{ wsus_filename_2019 }}"
+  when: 
+    - "'Windows Server 2019' in ansible_distribution"
+    - ansible_distribution_version.startswith('10.0.17763')
+
+- name: Set WSUS variables for Windows Server 2022
+  set_fact:
+    kb: "{{ kb_win2022 }}"
+    wsus_folder: "{{ wsus_folder_2022 }}"
+    wsus_filename: "{{ wsus_filename_2022 }}"
+  when: 
+    - "'Windows Server 2022' in ansible_distribution"
+    - ansible_distribution_version.startswith('10.0.20348')

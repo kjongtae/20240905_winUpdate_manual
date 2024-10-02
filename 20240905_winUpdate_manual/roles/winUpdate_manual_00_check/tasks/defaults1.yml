@@ -1,0 +1,102 @@
+---
+#- name: Get the current timestamp
+#  win_shell: |
+#    $timestamp = Get-Date -Format "yyyyMMdd_HHmm"
+#    Write-Output $timestamp
+#  register: timestamp_result
+
+- name: ckeck date
+  shell: "date +%Y-%m-%d"
+  register: ck_date1
+  delegate_to: localhost
+
+- name: ckeck time
+  shell: "date +%H:%M"
+  register: ck_time1
+  delegate_to: localhost
+
+- name: ckeck WinRM Port
+  wait_for:
+    host: "{{ ansible_host }}"
+    port: 5985
+    timeout: 5
+  register: ck_winrm_port
+  ignore_errors: yes
+  delegate_to: localhost
+
+- name: ckeck WinRM
+  win_service:
+    name: WinRM
+  register: ck_winrm
+  ignore_unreachable: yes
+
+- name: WinRM / running
+  set_fact:
+    winrm_state:
+      "{{ ck_winrm.state }}"
+  when:
+  - "'state' in ck_winrm"
+
+- name: WinRM / Not running
+  set_fact:
+    winrm_state:
+      "NotRunning"
+  when:
+  - "'unreachable' in ck_winrm"
+  - ck_winrm.unreachable |bool
+
+
+- name: WinrRM_Port / NotRunning
+  set_fact:
+    winrm_port_state:
+      "NotRunning"
+
+- name: WinrRM_Port / running
+  set_fact:
+    winrm_port_state:
+      "{{ ck_winrm_port.state }}"
+  when:
+  - "'state' in ck_winrm_port"
+
+- name: url define create
+  set_fact:
+    post_win_server_patch_create_url:
+      "http://172.30.208.165:9200/my_winmanual00check/_doc/{{ inventory_hostname }}"
+
+- name: url define update
+  set_fact:
+    post_win_server_patch_update_url:
+      "http://172.30.208.165:9200/my_winmanual00check/_update/{{ inventory_hostname }}"
+
+- name: winrm / Failed / set_fact
+  set_fact:
+    act_result: {
+     'ipAddress': "{{ ansible_host }}",
+     'hostname': "noData",
+     'winrmStae': "{{ winrm_state }}",
+     'winrmPortStae': "{{ winrm_port_state }}",
+     'osVer': "noData",
+     'startDate': "{{ ck_date1.stdout_lines.0 }}",
+     'startTime': "{{ ck_time1.stdout_lines.0 }}",
+     'lastUdate': "noData",
+     'lastKB': "noData",
+     'rebootRequired': "noData",
+     'endTime': "noData"
+    }
+
+- name: insert result
+  ansible.builtin.uri:
+    url: "{{ post_win_server_patch_create_url }}"
+    user: "elastic"
+    password: "elastic1234"
+    method: POST
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    body_format: json
+    body:
+      "{{ act_result }}"
+    validate_certs: no
+    status_code: 200,201
+    timeout: 10
+  delegate_to: localhost

@@ -1,0 +1,23 @@
+---
+- hosts: "{{ HostName }}"
+  gather_facts: yes
+#  serial: 1
+  vars:
+#    ansible_user: "{{ lookup('community.hashi_vault.hashi_vault', 'secret=gmarket/ansible-kv/data/ansible-win:username token_validate=false token=hvs.CAESIHfMqCwgj5QIQStzqZZMjhXoaFO9cL2PX0OSJktpVkqFGikKImh2cy5DMHZxZWNicGR4akZSdnR5cmh2NGRkZm4ubzVjcVAQ6fWSAQ url=https://vault.gmarket.co.kr:8200') }}"
+#    ansible_password: "{{ lookup('community.hashi_vault.hashi_vault', 'secret=gmarket/ansible-kv/data/ansible-win:password token_validate=false token=hvs.CAESIHfMqCwgj5QIQStzqZZMjhXoaFO9cL2PX0OSJktpVkqFGikKImh2cy5DMHZxZWNicGR4akZSdnR5cmh2NGRkZm4ubzVjcVAQ6fWSAQ url=https://vault.gmarket.co.kr:8200') }}"
+    ansible_user: "{{ lookup('env', 'ANSIBLE_USER') }}"
+    ansible_password: "{{ lookup('env', 'ANSIBLE_PASSWORD') }}"
+#    ansible_winrm_realm: gmarket.nh
+
+  roles:
+    - role: winUpdate_manual_00_check
+      tags:
+      - check
+
+    - role: winUpdate_manual_01_install
+      tags:
+      - install
+
+    - role: winUpdate_manual_02_reboot
+      tags:
+      - reboot

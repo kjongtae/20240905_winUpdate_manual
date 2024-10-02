@@ -1,0 +1,20 @@
+---
+- name: ck installed
+  uri:
+    url: "http://172.30.208.165:9200/my_winmanual00check/_doc/{{ inventory_hostname }}"
+    user: "elastic"
+    password: "elastic1234"
+    method: GET
+    status_code: 200,201
+  delegate_to: localhost
+  register: ck_install_url
+  ignore_errors: true
+
+- name: set installd var
+  set_fact:
+    ck_install: "{{ ck_install_url.json._source.rebootRequired }}"
+  ignore_errors: true
+
+- name: print installd var
+  debug:
+    msg: "{{ ck_install }}"

@@ -1,0 +1,23 @@
+---
+# tasks file for WinUpdate
+- name: Lv.0 / default check / check updated
+  include_tasks: defaults0.yml
+
+- name: Lv.1 / define 1
+  include_tasks: defaults1.yml
+
+- name: Lv.2 / define 2
+  include_tasks: defaults2.yml
+
+- name: Lv.3 / update info
+  include_tasks: defaults3.yml
+  when:
+  - ck_install | bool
+
+- name: Lv.4 / install
+  include_tasks: defaults4.yml
+  when:
+  - ck_install | bool
+
+- name: Lv.5 / update result
+  include_tasks: defaults5.yml

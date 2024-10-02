@@ -1,0 +1,97 @@
+---
+- name: ckeck time2
+  shell: "date +%H:%M"
+  register: end_time
+  delegate_to: localhost
+
+- name: Display lines containing "Error" from dism.log
+  win_shell: |
+    Get-Content "C:\winUpdateDN\dism_{{ timestamp }}.log" | Select-String "Error" -CaseSensitive
+  register: dism_error_lines
+  ignore_errors: yes
+  ignore_unreachable: yes
+  when:
+    - ck_install | bool
+
+- name: Show lines containing "Error"
+  debug:
+    msg: "{{ dism_error_lines.stdout_lines }}"
+  ignore_errors: yes
+  ignore_unreachable: yes
+  when:
+    - ck_install | bool
+
+- name: Check if dism.log contains "Error"
+  win_shell: |
+    $content = Get-Content -Path "C:\winUpdateDN\dism_{{ timestamp }}.log" -Raw
+    if ($content.Contains("Error")) {
+        Write-Output "false"
+    } else {
+        Write-Output "true"
+    }
+  register: dism_check
+  ignore_errors: yes
+  ignore_unreachable: yes
+  when:
+    - ck_install | bool
+
+#- name: Set rebootRequired variable based on dism.log content
+#  set_fact:
+#    rebootRequired: "{{ dism_check.stdout }}"
+#  ignore_errors: yes
+#  ignore_unreachable: yes
+#  when:
+#    - ck_install | bool
+
+- name: Set rebootRequired variable based on dism.log content
+  set_fact:
+    rebootRequired: "{{ dism_check.stdout | trim }}"
+  ignore_errors: yes
+  ignore_unreachable: yes
+  when:
+    - ck_install | bool
+
+- name: result / set_fact
+  set_fact:
+    act_result: {
+      'doc': {
+        'rebootRequired': "{{ rebootRequired }}",
+        'endTime': "{{ end_time.stdout_lines.0 }}"
+      }
+    }
+  ignore_errors: yes
+  ignore_unreachable: yes
+  when:
+    - ck_install | bool
+
+- name: result / set_fact
+  set_fact:
+    act_result: {
+      'doc': {
+        'endTime': "{{ end_time.stdout_lines.0 }}"
+      }
+    }
+  ignore_errors: yes
+  ignore_unreachable: yes
+  when:
+    - not ck_install | bool
+
+- name: insert result
+  ansible.builtin.uri:
+    url: "{{ post_win_server_patch_update_url }}"
+    user: "elastic"
+    password: "elastic1234"
+    method: POST
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+#       body_format: classesRating_mapping.json
+    body_format: json
+    body:
+      "{{ act_result }}"
+    validate_certs: no
+    status_code: 200,201
+    timeout: 10
+  delegate_to: localhost
+  ignore_errors: yes
+  ignore_unreachable: yes

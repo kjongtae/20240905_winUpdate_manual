@@ -1,0 +1,26 @@
+---
+#KB
+#kb_win2012: "KB5030329"
+kb_win2012: "KB5031419"
+kb_win2016: "KB5039214"
+kb_win2019: "KB5039217"
+kb_win2022: "KB5039227"
+
+# wsus server
+wsus_base_url: "http://syswsus.gmarket.co.kr:8530/Content"
+
+# file dir & file / 2012
+wsus_folder_2012: "75"
+wsus_filename_2012: "ED592C7858FC89C8BB109FF1C4B5EFA816C25075.cab"
+
+# file dir & file / 2016
+wsus_folder_2016: "EB"
+wsus_filename_2016: "4DCB1318838FFAC20F3C75A3AF3077E7A2E2F4EB.cab"
+
+# file dir & file / 2019
+wsus_folder_2019: "62"
+wsus_filename_2019: "A8ED247BB35A89A5DF324789131DC2C27CAFD862.cab"
+
+# file dir & file / 2022
+wsus_folder_2022: "73"
+wsus_filename_2022: "BD23035AC4299E74C23E82DB5F86B38425061373.cab"

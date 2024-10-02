@@ -1,0 +1,69 @@
+---
+- name: get hostname
+  win_shell: echo %COMPUTERNAME%
+  args:
+    executable: cmd.exe
+  register: win_server_hostname
+
+- name: get os version
+  win_shell: |
+    $osVer=(Get-ItemProperty "HKLM:\Software\Microsoft\Windows NT\CurrentVersion").ProductName
+    Write-Output $osVer.Trim()
+  register: win_server_osname
+
+- name: get update info
+  win_shell: |
+    $hotfixes = Get-HotFix; $targetHotfixes = "{{ kb }}"; $targetHotfixes | ForEach-Object { if ($hotfixes.HotFixID -contains $_) { "$_" } }
+  register: bKB
+
+- name: print bKB info
+  debug:
+    msg: "{{ bKB.stdout_lines }}"
+
+- name: print kb info
+  debug:
+    msg: "{{ kb }}"
+
+- name: get update info2
+  win_shell: |
+    (Get-HotFix | Sort-Object InstalledOn -Descending | Select-Object -First 1 -ExpandProperty InstalledOn).ToString('yyyy-MM-dd')
+  register: lUdate
+
+- name: print update info2
+  debug:
+    msg: "{{ lUdate.stdout_lines }}"
+
+- name: compare ck_install with kb
+  set_fact:
+    rebootRequired: "{{ 'false' if kb in bKB.stdout_lines else 'true' }}"
+  ignore_errors: true
+
+- name: result / set_fact
+  set_fact:
+    act_result: {
+      'doc': {
+        'hostname': "{{ win_server_hostname.stdout_lines.0 }}",
+        'osVer': "{{ win_server_osname.stdout_lines.0 }}",
+        'rebootRequired': "{{ rebootRequired }}",
+        'lastUdate': "{{ lUdate.stdout_lines }}",
+        'lastKB': "{{ bKB.stdout_lines }}"
+      }
+    }
+
+- name: insert result
+  ansible.builtin.uri:
+    url: "{{ post_win_server_patch_update_url }}"
+    user: "elastic"
+    password: "elastic1234"
+    method: POST
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+#       body_format: classesRating_mapping.json
+    body_format: json
+    body:
+      "{{ act_result }}"
+    validate_certs: no
+    status_code: 200,201
+    timeout: 10
+  delegate_to: localhost

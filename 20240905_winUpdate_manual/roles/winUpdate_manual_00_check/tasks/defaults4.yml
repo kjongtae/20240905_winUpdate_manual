@@ -1,0 +1,30 @@
+---
+#- name: Print facts
+#  ansible.builtin.debug:
+#    var: ansible_facts
+
+- name: define
+  set_fact:
+    wsus_base_url: "{{ wsus_base_url }}"
+    wsus_folder: "{{ wsus_folder }}"
+    wsus_filename: "{{ wsus_filename }}"
+
+- name: Ensure the destination directory exists
+  win_file:
+    path: C:\winUpdateDN
+    state: directory
+  register: mkdir_result
+
+- name: Print mkdir result
+  debug:
+    var: mkdir_result
+
+- name: Download the file
+  win_get_url:
+    url: "{{ wsus_base_url }}/{{ wsus_folder }}/{{ wsus_filename }}"
+    dest: "C:\\winUpdateDN\\{{ wsus_filename }}"
+  register: download_result
+
+- name: Print download result
+  debug:
+    var: download_result

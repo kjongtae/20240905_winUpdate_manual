@@ -1,0 +1,57 @@
+---
+#- name: Print facts
+#  ansible.builtin.debug:
+#    var: ansible_facts
+
+#- name: define
+#  set_fact:
+#    wsus_base_url: "{{ wsus_base_url }}"
+#    wsus_folder: "{{ wsus_folder }}"
+#    wsus_filename: "{{ wsus_filename }}"
+
+#- name: Ensure the destination directory exists
+#  win_file:
+#    path: C:\winUpdateDN
+#    state: directory
+#  register: mkdir_result
+
+#- name: Print mkdir result
+#  debug:
+#    var: mkdir_result
+
+#- name: Download the file
+#  win_get_url:
+#    url: "{{ wsus_base_url }}/{{ wsus_folder }}/{{ wsus_filename }}"
+#    dest: "C:\\winUpdateDN\\{{ wsus_filename }}"
+#  register: download_result
+
+#- name: Print download result
+#  debug:
+#    var: download_result
+
+- name: Get the current timestamp
+  win_shell: |
+    $timestamp = Get-Date -Format "yyyyMMdd_HHmm"
+    Write-Output $timestamp
+  register: timestamp_result
+
+- name: Set timestamp as a fact
+  set_fact:
+    timestamp: "{{ timestamp_result.stdout }}"
+
+- name: Check if the timestamp variable is set
+  debug:
+    msg: "Timestamp is {{ timestamp }}"
+  when: timestamp is defined
+
+- name: Install the downloaded package without restart
+  win_shell: |
+    $logpath = "C:\\winUpdateDN\\dism_{{ timestamp }}.log"
+    dism /online /add-package /packagepath:"C:\\winUpdateDN\\{{ wsus_filename }}" /norestart /quiet /logpath:"$logpath"
+  register: update_result
+  ignore_errors: yes
+  when: timestamp is defined
+
+- name: Print update result
+  debug:
+    var: update_result
