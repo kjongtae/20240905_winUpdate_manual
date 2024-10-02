@@ -61,12 +61,12 @@
 - name: url define create
   set_fact:
     post_win_server_patch_create_url:
-      "http://172.30.208.165:9200/my_winmanual01install/_doc/{{ inventory_hostname }}"
+      "http://myserver:9200/my_winmanual01install/_doc/{{ inventory_hostname }}"
 
 - name: url define update
   set_fact:
     post_win_server_patch_update_url:
-      "http://172.30.208.165:9200/my_winmanual01install/_update/{{ inventory_hostname }}"
+      "http://myserver:9200/my_winmanual01install/_update/{{ inventory_hostname }}"
 
 - name: winrm / Failed / set_fact
   set_fact:

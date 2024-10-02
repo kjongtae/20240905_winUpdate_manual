@@ -7,7 +7,7 @@ kb_win2019: "KB5039217"
 kb_win2022: "KB5039227"
 
 # wsus server
-wsus_base_url: "http://syswsus.gmarket.co.kr:8530/Content"
+wsus_base_url: "http://syswsus.myserver.co.kr:8530/Content"
 
 # file dir & file / 2012
 wsus_folder_2012: "75"

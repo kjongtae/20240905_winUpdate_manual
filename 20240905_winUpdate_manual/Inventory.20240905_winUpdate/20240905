@@ -1,16 +1,16 @@
 [win]
-syswuptest01mm ansible_host=172.30.243.102
-#syswuptest02mm ansible_host=172.30.243.103
-#syswuptest03mm ansible_host=172.30.243.104
-#syswuptest01zz ansible_host=172.18.208.7
-#syswuptest02zz ansible_host=172.18.208.8
-#syswuptest03zz ansible_host=172.18.208.9
+syswuptest01aa ansible_host=172.30.243.102
+#syswuptest02aa ansible_host=172.30.243.103
+#syswuptest03aa ansible_host=172.30.243.104
+#syswuptest01ab ansible_host=172.18.208.7
+#syswuptest02ab ansible_host=172.18.208.8
+#syswuptest03ab ansible_host=172.18.208.9
 #syswuptest01aa ansible_host=192.168.213.45
 #syswuptest02aa ansible_host=192.168.213.46
 #syswuptest03aa ansible_host=192.168.213.47
-#syswuptest01pp ansible_host=172.21.101.135
-#syswuptest02pp ansible_host=172.21.101.136
-#syswuptest03pp ansible_host=172.21.101.137
+#syswuptest01ac ansible_host=172.21.101.135
+#syswuptest02ac ansible_host=172.21.101.136
+#syswuptest03ac ansible_host=172.21.101.137
 
 [win:vars]
 ansible_port=5985
