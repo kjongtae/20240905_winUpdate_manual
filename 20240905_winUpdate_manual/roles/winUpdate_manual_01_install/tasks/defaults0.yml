@@ -1,7 +1,7 @@
 ---
 - name: ck installed
   uri:
-    url: "http://myserver:9200/my_winmanual00check/_doc/{{ inventory_hostname }}"
+    url: "http://127.0.0.1:9200/my_winmanual00check/_doc/{{ inventory_hostname }}"
     user: "elastic"
     password: "elastic1234"
     method: GET
